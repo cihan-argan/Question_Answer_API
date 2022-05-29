@@ -1,20 +1,24 @@
 {
-  "name": "question_answer_api",
-  "version": "1.0.0",
-  "description": "Express-Question Answer Api",
-  "main": "server.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "Question_Answer_api"
-  },
-  "keywords": [
-    "express",
-    "rest",
-    "api"
-  ],
-  "author": "Cihan Arğan",
-  "license": "MIT"
+	"name": "question_answer_api",
+	"version": "1.0.0",
+	"description": "Express-Question Answer Api",
+	"main": "server.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"start": "nodemon server.js",
+		"dev": "nodemon server.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "Question_Answer_api"
+	},
+	"keywords": [ "express", "rest", "api" ],
+	"author": "Cihan Arğan",
+	"license": "MIT",
+	"dependencies": {
+		"express": "^4.18.1"
+	},
+	"devDependencies": {
+		"nodemon": "^2.0.16"
+	}
 }
