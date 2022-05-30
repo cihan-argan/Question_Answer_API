@@ -1,15 +1,10 @@
-//Auth.js
+//Routers > auth.js
 const express = require('express');
 // /api/auth
 const router = express.Router();
+const { register } = require('../controllers/auth');
 
-router.get('/', (req, res) => {
-	res.send('Auth Home Page');
-});
+router.post('/register', register);
 
-// /api/auth/register
-router.get('/register', (req, res) => {
-	res.send('Auth Register Page');
-});
 //kullanabilmek için
 module.exports = router;
