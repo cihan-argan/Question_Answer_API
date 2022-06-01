@@ -2,6 +2,7 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const connectDatabase = require('./helpers/database/connectDatabase');
+const customErrorHandler = require('./middlewares/errors/customErrorHandlers');
 
 const routers = require('./routers');
 //Enviroment Variables //bu config ayarı en üstlerde olmalı
@@ -16,6 +17,9 @@ const port = process.env.PORT; //Başka bir yerde 5040 portu geçerli olmaya bil
 
 //Routers Middleware
 app.use('/api', routers);
+
+//Error Handler
+app.use(customErrorHandler);
 
 app.listen(port, () => {
 	console.log(`App start on ${port}:${process.env.NODE_ENV}`);
