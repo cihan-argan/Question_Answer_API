@@ -1,6 +1,7 @@
 //Controller>auth.js
 const customErrorHandler = require('../middlewares/errors/customErrorHandlers');
 const User = require('../models/User');
+const CustomError = require('../helpers/error/CustomErrors');
 
 const register = async (req, res, next) => {
 	//POST DATA gelecek fakat test amaçlı biz verileri burda oluşturucaz.
@@ -31,7 +32,9 @@ const errorTest = (req, res, next) => {
 	//senkron kodda hata yakalama
 	//Belirli code lar mevcut
 	//Burda bir hata oluştu express senkron kod içinde oluşan hatayı direkt yakalicak nasıl yakalanılır.
-	throw new Error('Bir hata oluştu '); //Bu andan itibaren express kendi içindeki error handling mekanizması vasıtasıyla bu error u yakalayacak ve bize response umuzu dönecek.
+	//Question does not exist
+	//return next(new CustomError("Message","statuscode")) bu şekilde kendi oluşturduğumuz custom class ile kendi hatalarımızı ve kendi status kodlarımızı yollicaz.(helpers içinde hazırlicaz)
+	return next(new SyntaxError('SyntaxError', 400)); //Bu andan itibaren express kendi içindeki error handling mekanizması vasıtasıyla bu error u yakalayacak ve bize response umuzu dönecek.
 
 	//belirli kodlar mevcut
 };
