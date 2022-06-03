@@ -12,7 +12,7 @@ const UserSchema = new Schema({
 		type: String,
 		trim: true,
 		lowercase: true,
-		required: true,
+		required: [ true, 'Please provide a email' ],
 		unique: [ true, 'Please try different email' ], //bir e maile bir kullanıcı olacak
 		match: [ /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please provide a  valid email' ] //belirli taslakta mail yazılmalı boş bırakılamaz
 	},
