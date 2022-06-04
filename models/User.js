@@ -1,5 +1,6 @@
 //models/ User.js
 const mongoose = require('mongoose');
+var bcrypt = require('bcryptjs'); // hash işlemi için gerekli paketi dahil ediyoruz.
 
 const Schema = mongoose.Schema;
 
@@ -51,5 +52,21 @@ const UserSchema = new Schema({
 		type: Boolean, //Admin tarafından block lanma durumu default false olacak.
 		default: false
 	}
+});
+
+UserSchema.pre('save', function(next) {
+	//parola değişmemişse
+	if (!this.isModified('password')) {
+		//isModified içine yazdığımız alan değişmişse true değişmemişse false dönecek. önüne ! koyduğumuz için değişmediği durumu değerlendireceğiz.yani parolamamız değişmemişse burda direkt  aşşağıdaki işlemlere girmeden next() diyerek işlemlerime devam edicez.
+		next();
+	} //eğer parola değişmişse  if çalışmayacak alttaki kod bloğu çalışacak NOt:isModified mongoose içindeki bir metoddur.
+	bcrypt.genSalt(10, (err, salt) => {
+		if (err) next(err);
+		bcrypt.hash(this.password, salt, (err, hash) => {
+			if (err) next(err);
+			this.password = hash;
+			next();
+		});
+	});
 });
 module.exports = mongoose.model('User', UserSchema);
