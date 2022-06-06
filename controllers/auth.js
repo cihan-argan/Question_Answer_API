@@ -14,6 +14,10 @@ const register = asyncErrorWrapper(async (req, res, next) => {
 		password //password :password ES6 Standartları gereği bu şekilde vermeye gerek kalmadı.bu veriler beklenecek bir hata çıkmaz ise yani validation hatası çıkmaz ise verilerimiz gelecek bizde bunu const user olarak alabileceğiz.
 	});
 	//Not: Postman üzerinden registera post yapınca fonksiyonumuz çalışacak ve userımız oluşacak oluşan user bize geri dönecek.
+
+	//Token işlemleri 
+	const token = user.generateJWTFromUser();
+	console.log(token);
 	res.status(200).json({
 		success: true,
 		data: user
