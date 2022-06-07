@@ -53,7 +53,7 @@ const UserSchema = new Schema({
 		default: false
 	}
 });
-//UserSchema Methods
+//UserSchema Methods Token 
 UserSchema.methods.generateJWTFromUser = function() {
 	//secret key ve ExpiresIn Süremizi config.env içinde aldığımız için bunu kullanabilmek için aktif etmeliyiz
 	const { JWT_SECRET_KEY, JWT_EXPIRE } = process.env;

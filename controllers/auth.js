@@ -1,6 +1,7 @@
 //Controller>auth.js
 const customErrorHandler = require('../middlewares/errors/customErrorHandlers');
 const User = require('../models/User');
+const sendJwtToClient = require('../helpers/authorization/sendJwtToClient');
 const CustomError = require('../helpers/error/CustomErrors');
 const asyncErrorWrapper = require('express-async-handler');
 
@@ -14,14 +15,7 @@ const register = asyncErrorWrapper(async (req, res, next) => {
 		password //password :password ES6 Standartları gereği bu şekilde vermeye gerek kalmadı.bu veriler beklenecek bir hata çıkmaz ise yani validation hatası çıkmaz ise verilerimiz gelecek bizde bunu const user olarak alabileceğiz.
 	});
 	//Not: Postman üzerinden registera post yapınca fonksiyonumuz çalışacak ve userımız oluşacak oluşan user bize geri dönecek.
-
-	//Token işlemleri 
-	const token = user.generateJWTFromUser();
-	console.log(token);
-	res.status(200).json({
-		success: true,
-		data: user
-	});
+	sendJwtToClient(user, res);
 });
 
 const errorTest = (req, res, next) => {
