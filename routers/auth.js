@@ -2,13 +2,11 @@
 const express = require('express');
 // /api/auth
 const router = express.Router();
-const { register ,errorTest } = require('../controllers/auth');
+const { register, tokentest } = require('../controllers/auth');
+const { getAccessToRoute } = require('../middlewares/authorization/auth');
 
 router.post('/register', register);
-
-//Deneme amaçlı routh error handling konusu için
-router.get('/error', errorTest);
-
+router.get('/tokentest',getAccessToRoute, tokentest);
 
 //kullanabilmek için
 module.exports = router;

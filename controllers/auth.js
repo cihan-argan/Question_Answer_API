@@ -1,7 +1,7 @@
 //Controller>auth.js
 const customErrorHandler = require('../middlewares/errors/customErrorHandlers');
 const User = require('../models/User');
-const sendJwtToClient = require('../helpers/authorization/sendJwtToClient');
+const {sendJwtToClient}  = require('../helpers/authorization/tokenHelpers');
 const CustomError = require('../helpers/error/CustomErrors');
 const asyncErrorWrapper = require('express-async-handler');
 
@@ -18,17 +18,13 @@ const register = asyncErrorWrapper(async (req, res, next) => {
 	sendJwtToClient(user, res);
 });
 
-const errorTest = (req, res, next) => {
-	//senkron kodda hata yakalama
-	//Belirli code lar mevcut
-	//Burda bir hata oluştu express senkron kod içinde oluşan hatayı direkt yakalicak nasıl yakalanılır.
-	//Question does not exist
-	//return next(new CustomError("Message","statuscode")) bu şekilde kendi oluşturduğumuz custom class ile kendi hatalarımızı ve kendi status kodlarımızı yollicaz.(helpers içinde hazırlicaz)
-	return next(new SyntaxError('SyntaxError', 400)); //Bu andan itibaren express kendi içindeki error handling mekanizması vasıtasıyla bu error u yakalayacak ve bize response umuzu dönecek.
-
-	//belirli kodlar mevcut
+const tokentest = (req, res, next) => {
+	res.json({
+		success: true,
+		message: 'Welcome'
+	});
 };
 module.exports = {
 	register,
-	errorTest
+	tokentest
 };
