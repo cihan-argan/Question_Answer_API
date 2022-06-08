@@ -9,7 +9,7 @@ const sendJwtToClient = (user, response) => {
 		.status(200)
 		.cookie('access_token', token, {
 			httpOnly: true,
-			expires: new Date(Date.now() + parseInt(JWT_COOKIE) * 1000), // config.env içinden alacağız.
+			expires: new Date(Date.now() + parseInt(JWT_COOKIE) * 1000 * 60), // config.env içinden alacağız.
 			secure: NODE_ENV === 'development' ? false : true //Node env development ise false değilse true olacak
 		})
 		.json({
@@ -27,10 +27,9 @@ const isTokenIncluded = (req) => {
 };
 const getAccessTokenFromHeader = (req) => {
 	const authorization = req.headers.authorization;
-	const access_token = authorization.split(" ")[1];//Bearer: sonra boşluk var 
+	const access_token = authorization.split(' ')[1]; //Bearer: sonra boşluk var
 	return access_token;
-
-}
+};
 module.exports = {
 	sendJwtToClient,
 	isTokenIncluded,
