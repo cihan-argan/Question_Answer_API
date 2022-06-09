@@ -35,7 +35,24 @@ const login = asyncErrorWrapper(async (req, res, next) => {
 		//formdan aldığım password ve userın passwordu(hashlenmiş) verildi.
 		return next(new CustomError('Please check your credentials', 400));
 	}
-	sendJwtToClient(user, res);//password da doğruysa tokenı tekrar gösterebiliriz.
+	sendJwtToClient(user, res); //password da doğruysa tokenı tekrar gösterebiliriz.
+});
+
+const logout = asyncErrorWrapper(async (req, res, next) => {
+	//Tokenler silinicek bunun için ilk başta envoirement değişkenlerimizi almamız gerekecek.
+	const { NODE_ENV } = process.env;
+
+	return res
+		.status(200)
+		.cookie({
+			httpOnly: true,
+			expires: new Date(Date.now()), //Çıkış süremizi o anı yapmalısın ki oturum sonlansın bu sayede Logout yapınca cookieimiz yok olmuş olacak
+			secure: NODE_ENV === 'development' ? false : true // development ise false production ise true olacak.
+		})
+		.json({
+			success: true,
+			message: 'Logout Successfull'
+		});
 });
 const getUser = (req, res, next) => {
 	res.json({
@@ -49,5 +66,6 @@ const getUser = (req, res, next) => {
 module.exports = {
 	register,
 	login,
+	logout,
 	getUser
 };
