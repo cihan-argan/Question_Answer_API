@@ -65,10 +65,23 @@ const getUser = (req, res, next) => {
 };
 
 const imageUpload = asyncErrorWrapper(async (req, res, next) => {
+	//veri tabanı güncellenmesi
+	const user = await User.findByIdAndUpdate(
+		req.user.id,
+		{
+			profile_image: req.savedProfileImage
+		},
+		{
+			new: true,
+			runValidators: true
+		}
+	);
+
 	//Image Upload Success
 	res.status(200).json({
 		success: true,
-		message: 'Image Upload Successfull'
+		message: 'Image Upload Successful',
+		data: user
 	});
 });
 module.exports = {
