@@ -2,6 +2,7 @@
 const mongoose = require('mongoose');
 var bcrypt = require('bcryptjs'); // hash işlemi için gerekli paketi dahil ediyoruz.
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
@@ -20,7 +21,7 @@ const UserSchema = new Schema({
 	role: {
 		type: String,
 		enum: [ 'user', 'admin' ],
-		default: 'user',
+		default: 'user'
 	},
 	password: {
 		type: String,
@@ -51,9 +52,29 @@ const UserSchema = new Schema({
 	bloked: {
 		type: Boolean, //Admin tarafından block lanma durumu default false olacak.
 		default: false
+	},
+	resetPasswordToken: {
+		type: String
+	},
+	resetPasswordExpire: {
+		type: Date
 	}
 });
-//UserSchema Methods Token 
+//UserSchema getResetPasswordTokenFromUser
+UserSchema.methods.getResetPasswordTokenFromUser = function() {
+	const { RESET_PASSWORD_EXPIRE } = process.env;
+	const randomHexString = crypto.randomBytes(15).toString('hex'); //15 tane random bytlar üretecek bu password tokenın ne kadar uzun olmasını istiyorsanız o kadar belirtebilirsiniz.hexadecimal stringlere cevirmek için kullandık.
+
+	const resetPasswordToken = crypto
+		.createHash('SHA256') //Birçok algoritma var genelde bu kullanılır.
+		.update(randomHexString) //Tokenımızı randomHexString vasıtası ile oluşturucaz.
+		.digest('hex'); // digest hexadecimal olarak oluşturmak için belirtiyoruz.
+	//console.log(resetPasswordToken); oluştu bunu UserSchema içindeki resetPasswordToken içine kayıtedicez.
+	this.resetPasswordToken = resetPasswordToken;
+	this.resetPasswordExpire = Date.now() + parseInt(RESET_PASSWORD_EXPIRE); //config.env içinden atıcaz orada bu süreyi belirteceğiz.ms cinsinden olacak 1 saat vermek için 1 saat = 3600 000 ms verdik//şuandan 1 saat sonrası olacak
+};
+
+//UserSchema Methods Token
 UserSchema.methods.generateJWTFromUser = function() {
 	//secret key ve ExpiresIn Süremizi config.env içinde aldığımız için bunu kullanabilmek için aktif etmeliyiz
 	const { JWT_SECRET_KEY, JWT_EXPIRE } = process.env;

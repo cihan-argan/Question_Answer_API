@@ -5,7 +5,7 @@ const { sendJwtToClient } = require('../helpers/authorization/tokenHelpers');
 const CustomError = require('../helpers/error/CustomErrors');
 const asyncErrorWrapper = require('express-async-handler');
 const { validateUserInput, comparePassword } = require('../helpers/inputs/inputHelpers');
-
+//register
 const register = asyncErrorWrapper(async (req, res, next) => {
 	//POST DATA
 	const { name, email, password, role } = req.body;
@@ -19,7 +19,7 @@ const register = asyncErrorWrapper(async (req, res, next) => {
 	//Not: Postman üzerinden registera post yapınca fonksiyonumuz çalışacak ve userımız oluşacak oluşan user bize geri dönecek.
 	sendJwtToClient(user, res);
 });
-
+//login
 const login = asyncErrorWrapper(async (req, res, next) => {
 	const { email, password } = req.body;
 	if (!validateUserInput(email, password)) {
@@ -37,7 +37,7 @@ const login = asyncErrorWrapper(async (req, res, next) => {
 	}
 	sendJwtToClient(user, res); //password da doğruysa tokenı tekrar gösterebiliriz.
 });
-
+//logout
 const logout = asyncErrorWrapper(async (req, res, next) => {
 	//Tokenler silinicek bunun için ilk başta envoirement değişkenlerimizi almamız gerekecek.
 	const { NODE_ENV } = process.env;
@@ -54,6 +54,7 @@ const logout = asyncErrorWrapper(async (req, res, next) => {
 			message: 'Logout Successfull'
 		});
 });
+//getUser
 const getUser = (req, res, next) => {
 	res.json({
 		success: true,
@@ -63,7 +64,7 @@ const getUser = (req, res, next) => {
 		}
 	});
 };
-
+//ImageUpload
 const imageUpload = asyncErrorWrapper(async (req, res, next) => {
 	//veri tabanı güncellenmesi
 	const user = await User.findByIdAndUpdate(
@@ -84,9 +85,27 @@ const imageUpload = asyncErrorWrapper(async (req, res, next) => {
 		data: user
 	});
 });
+
+//forgatPassword
+const forgotPassword = asyncErrorWrapper(async (req, res, next) => {
+	const resetEmail = req.body.email;
+	//Yapmamız gereken ilk işlem kullanıcımızı bu email ile almak kullanıcı yoksada bu emaile sahip kullanıcı yok diye hata fırlatacağız
+	const user = await User.findOne({ email: resetEmail });
+	if (!user) {
+		return next(new CustomError('There is no user with that email ', 400));
+	}
+	//Geçtiysek kullanıcı var demektir. resetpasswordtokenı burda çalıştırabiliriz.
+	const resetPasswordToken = user.getResetPasswordTokenFromUser();
+	await user.save();
+	res.json({
+		success: true,
+		message: 'Token sent to your  email.'
+	});
+});
 module.exports = {
 	register,
 	login,
+	forgotPassword,
 	logout,
 	getUser,
 	imageUpload
