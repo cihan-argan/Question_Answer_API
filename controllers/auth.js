@@ -5,6 +5,7 @@ const { sendJwtToClient } = require('../helpers/authorization/tokenHelpers');
 const CustomError = require('../helpers/error/CustomErrors');
 const asyncErrorWrapper = require('express-async-handler');
 const { validateUserInput, comparePassword } = require('../helpers/inputs/inputHelpers');
+const sendEmail = require('../helpers/libraries/sendEmail');
 //register
 const register = asyncErrorWrapper(async (req, res, next) => {
 	//POST DATA
@@ -88,20 +89,50 @@ const imageUpload = asyncErrorWrapper(async (req, res, next) => {
 
 //forgatPassword
 const forgotPassword = asyncErrorWrapper(async (req, res, next) => {
-	const resetEmail = req.body.email;
+	const resetEmail = req.body.email; // emaili aldık
 	//Yapmamız gereken ilk işlem kullanıcımızı bu email ile almak kullanıcı yoksada bu emaile sahip kullanıcı yok diye hata fırlatacağız
-	const user = await User.findOne({ email: resetEmail });
+
+	const user = await User.findOne({ email: resetEmail }); // email ile eşleşen kullanıcı var mı
+
 	if (!user) {
-		return next(new CustomError('There is no user with that email ', 400));
+		return next(new CustomError('There is no user with that email ', 400)); // kullanıcı yoksa hata fırlattık
 	}
 	//Geçtiysek kullanıcı var demektir. resetpasswordtokenı burda çalıştırabiliriz.
-	const resetPasswordToken = user.getResetPasswordTokenFromUser();
-	await user.save();
-	res.json({
-		success: true,
-		message: 'Token sent to your  email.'
-	});
+	const resetPasswordToken = user.getResetPasswordTokenFromUser(); // varsa tokenımızı  user modeline kaydettiğimniz getresetpasswordtokenfromuser ile  user model içinde oluşturduk
+
+	await user.save(); // user.save diyerek userımıza kaydettik.resetPasswordToken ve resetPasswordExpire oluşturduk
+	//maili göndereceğiz
+	//1.adım mail içeriğinin hangi url ye gideceğini söyleyeceğiz
+	const resetPasswordUrl = `https://localhost:5040/api/auth/resetpassword?resetPasswordToken=${resetPasswordToken}`;
+	//mail içeriğimizin hangi urlye gönderileceğini belirtiyoruz.ve içine tokenimizi göndereceğiz.biz bir sonraki derste resetpassword adında bir rout tanımlicaz.ve buna gönderilen resetPasswordTokenı göndereceğiz.
+	//2.adım email template oluşturucaz
+	const emailTemplate = `
+		<h3> Reset Your Password </h3>
+		<p>This <a href = '${resetPasswordUrl}' target = '_blank'>link</a> will expire in 1 hour.</p>
+	`;
+
+	//3.adım aldıktan sonra await ile bu mailin gönderilmesini beklicem.Bunu try içine alıcam herhangi hata olursa bizim resetPasswordTokenı ve resetPasswordExpire ı  tekrardan undifined yapmamız gerekiyorYani burda merkezicustomerrorhandler değil kendi errorhandlerimizi kullanmaya çalışacağız o yüzden buraya try açıcaz.
+	try {
+		await sendEmail({
+			from: process.env.SMTP_USER, //nerden göndereceğiz
+			to: resetEmail, //kime göndereceğiz
+			subject: 'Reset Your Password', //mesaj başlığı
+			html: emailTemplate //html içeriği
+		});
+		return res.status(200).json({
+			success: true,
+			message: 'Token sent to your  email.'
+		});
+	} catch (err) {
+		//herhangi hata alırsak bu mail gönderilmemiş demektir bizim resetPasswordToken ve resetPasswordExpire ı alıp undifened yapmamız gerekiyor.
+
+		user.resetPasswordToken = undifened; //mail
+		user.resetPasswordExpire = undifened;
+		await user.save();
+		return next(new CustomError('Email Could Not Be Sent', 500));
+	}
 });
+
 module.exports = {
 	register,
 	login,

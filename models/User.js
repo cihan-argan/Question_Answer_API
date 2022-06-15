@@ -72,6 +72,7 @@ UserSchema.methods.getResetPasswordTokenFromUser = function() {
 	//console.log(resetPasswordToken); oluştu bunu UserSchema içindeki resetPasswordToken içine kayıtedicez.
 	this.resetPasswordToken = resetPasswordToken;
 	this.resetPasswordExpire = Date.now() + parseInt(RESET_PASSWORD_EXPIRE); //config.env içinden atıcaz orada bu süreyi belirteceğiz.ms cinsinden olacak 1 saat vermek için 1 saat = 3600 000 ms verdik//şuandan 1 saat sonrası olacak
+	return resetPasswordToken;
 };
 
 //UserSchema Methods Token
