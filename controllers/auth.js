@@ -6,6 +6,7 @@ const CustomError = require('../helpers/error/CustomErrors');
 const asyncErrorWrapper = require('express-async-handler');
 const { validateUserInput, comparePassword } = require('../helpers/inputs/inputHelpers');
 const sendEmail = require('../helpers/libraries/sendEmail');
+const { findOne } = require('../models/User');
 //register
 const register = asyncErrorWrapper(async (req, res, next) => {
 	//POST DATA
@@ -132,11 +133,41 @@ const forgotPassword = asyncErrorWrapper(async (req, res, next) => {
 		return next(new CustomError('Email Could Not Be Sent', 500));
 	}
 });
+const resetPassword = asyncErrorWrapper(async (req, res, next) => {
+	const { resetPasswordToken } = req.query; //Tokenımızı req.query içinden almamız gerekiyor.
+	//yeni parolamızda postmande body de row da json olarak "password":"123456789" olarak gönderilecek.bunuda almam gerekiyor.
+	const { password } = req.body;
+	//resetPasswordToken gönderilmemişse şeklinde kontrol gerçekleştirmem gerekiyor.
 
+	if (!resetPasswordToken) {
+		return next(new CustomError('Please provide a valid token ', 400));
+	}
+	//gönderilmişse biz bu tokena göre kullanıcımızı seçicez.
+	let user = await User.findOne({
+		resetPasswordToken: resetPasswordToken, //reset password token varsa ve ancak expire etmemişse yani 1 saat geçmemişse bu kullanıcımızın passwordunu güncellememiz gerekiyor.expire etmememe durumunu aşağıdaki gibi yapabiliriz.
+		resetPasswordExpire: { $gt: Date.now() } // expire 1 saat geçmiş ise yani şuanki tarihten ileri tarih olmasını sorgulamam gerekiyor bunnun için mongodb nin greater then sorgusunu kullanmam gerekiyor.Yani expire date.now dan büyükse getir demek oluyor.
+		//yani bu token henüz expire etmemişse ve bu tokenımız  mevcutsa o userı alacağız. ve sıfırlama işlemini gerçekleştirebiliriz.
+	});
+	//eğer user gelmezse
+	if (!user) {
+		return next(new CustomError('Invalid Token or Session Expired', 404));
+	}
+	user.password = password; // body içinden passwordu almıştık user.password = body içindeki passowrd oldu.
+	//ve artık token ve expire ımızı undifened yapmamız gerekiyor.
+	user.resetPasswordToken = undifened;
+	user.resetPasswordExpire = undifened;
+	//bu userımızı güncelledik ve artık veri tabanına yazmamız gerekiyor
+	await user.save(); // yeni parolamızda userSchema.pre("save",function) içine girip tekrar cryptolanacak.
+	return res.status(200).json({
+		success: true,
+		message: 'Reset Password Proccess Successfull'
+	});
+});
 module.exports = {
 	register,
 	login,
 	forgotPassword,
+	resetPassword,
 	logout,
 	getUser,
 	imageUpload
