@@ -6,7 +6,7 @@ const CustomError = require('../helpers/error/CustomErrors');
 const asyncErrorWrapper = require('express-async-handler');
 const { validateUserInput, comparePassword } = require('../helpers/inputs/inputHelpers');
 const sendEmail = require('../helpers/libraries/sendEmail');
-const { findOne } = require('../models/User');
+
 //register
 const register = asyncErrorWrapper(async (req, res, next) => {
 	//POST DATA
@@ -154,8 +154,8 @@ const resetPassword = asyncErrorWrapper(async (req, res, next) => {
 	}
 	user.password = password; // body içinden passwordu almıştık user.password = body içindeki passowrd oldu.
 	//ve artık token ve expire ımızı undifened yapmamız gerekiyor.
-	user.resetPasswordToken = undifened;
-	user.resetPasswordExpire = undifened;
+	//user.resetPasswordToken = undifened;
+	//user.resetPasswordExpire = undifened;
 	//bu userımızı güncelledik ve artık veri tabanına yazmamız gerekiyor
 	await user.save(); // yeni parolamızda userSchema.pre("save",function) içine girip tekrar cryptolanacak.
 	return res.status(200).json({
