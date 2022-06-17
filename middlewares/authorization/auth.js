@@ -1,4 +1,6 @@
 const CustomError = require('../../helpers/error/CustomErrors');
+const asyncErrorWrapper = require('express-async-handler');
+const User = require('../../models/User');
 const jwt = require('jsonwebtoken');
 const { isTokenIncluded, getAccessTokenFromHeader } = require('../../helpers/authorization/tokenHelpers');
 const getAccessToRoute = (req, res, next) => {
@@ -24,7 +26,16 @@ const getAccessToRoute = (req, res, next) => {
 		next();
 	});
 };
+const getAdminAccess = asyncErrorWrapper(async (req, res, next) => {
+	const { id } = req.user; //getAccessToRoute fonksiyonuna girdikten sonra id yi alacağız
+	const user = await User.findById(id); //aldığımız id ye göre kullanıcıyı bulacağız.
+	if (user.role !== 'admin') {
+		// Bulunan userın rolü admin değilse alttaki erroru yollicaz.
+		return next(new CustomError('Only admins can access this route ', 403)); //403 forbidden hatası
+	}
+	next(); //eğer kullanıcı admin ise sonraki fonksiyona yönlendirilecek.
+});
 module.exports = {
-	getAccessToRoute
+	getAccessToRoute, //bu middleware nerde kullanıcam routers/auth.js içinde kullanacağım başka yerlerde de kullanabilirim
+	getAdminAccess
 };
-//bu middleware nerde kullanıcam routers/auth.js içinde kullanacağım
