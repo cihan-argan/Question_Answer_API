@@ -163,6 +163,19 @@ const resetPassword = asyncErrorWrapper(async (req, res, next) => {
 		message: 'Reset Password Proccess Successfull'
 	});
 });
+const editDetails = asyncErrorWrapper(async (req, res, next) => {
+	const editInformation = req.body; //title,website... gibi bilgiler direkt buraya eklenecek
+	const user = await User.findByIdAndUpdate(req.user.id, editInformation, {
+		//(getAccessToRoute ile girilen userın idsi ,editlenecek bilgi,editli hali) şeklinde yapıcaz
+		new: true,
+		runValidators: true //bilgiler bu fonksiyon sayesinde güncellenmiş olacak.
+	});
+
+	return res.status(200).json({
+		success: true,
+		data: user
+	});
+});
 module.exports = {
 	register,
 	login,
@@ -170,5 +183,6 @@ module.exports = {
 	resetPassword,
 	logout,
 	getUser,
+	editDetails,
 	imageUpload
 };
