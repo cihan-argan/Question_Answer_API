@@ -3,6 +3,14 @@ const Question = require('../models/Question'); //İlk başta question modelini 
 const CustomError = require('../helpers/error/CustomErrors'); //CıstomError alınacak
 const asyncErrorWrapper = require('express-async-handler'); //asyncErrorWrapper alınacak
 
+const getAllQuetions = asyncErrorWrapper(async (req, res, next) => {
+	const questions = await Question.find(); //Tüm Questionları çekmeye çalışıyorum
+	return res.status(200).json({
+		success: true,
+		data: questions
+	});
+});
+
 const askNewQuestion = asyncErrorWrapper(async (req, res, next) => {
 	//biz request.Bodyden information ımızı alacağız.birde User Id yi buraya ekleyerek yeni bir questionı oluşturmaya çalışacağız.
 	const information = req.body;
@@ -21,4 +29,5 @@ const askNewQuestion = asyncErrorWrapper(async (req, res, next) => {
 		data: question
 	});
 });
-module.exports = { askNewQuestion };
+
+module.exports = { getAllQuetions, askNewQuestion };
