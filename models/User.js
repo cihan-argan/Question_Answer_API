@@ -2,6 +2,7 @@
 const mongoose = require('mongoose');
 var bcrypt = require('bcryptjs'); // hash işlemi için gerekli paketi dahil ediyoruz.
 const jwt = require('jsonwebtoken');
+const Question = require('./Question');
 const crypto = require('crypto');
 const Schema = mongoose.Schema;
 
@@ -105,6 +106,13 @@ UserSchema.pre('save', function(next) {
 			this.password = hash;
 			next();
 		});
+	});
+});
+UserSchema.post('remove', async function() {
+	await Question.deleteMany({
+		//bir çok question silineceği için deleteMany methodunu kullanıyoruz
+		user: this._id
+		//Buradaki işlem o userımızın id si ile eşleşen birden fazla soru varsa o kaldırılacak
 	});
 });
 module.exports = mongoose.model('User', UserSchema);
