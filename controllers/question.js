@@ -37,5 +37,17 @@ const getSingleQuestion = asyncErrorWrapper(async (req, res, next) => {
 		data: question
 	});
 });
+const editQuestion = asyncErrorWrapper(async (req, res, next) => {
+	const { id } = req.params; //req.params içinden id yi aldık
+	const { title, content } = req.body; //req.body içinden yeni title ve yeni contenti aldık
+	let question = await Question.findById(id); //let ile almamızın sebebi questionımızın daha sonra değişecek olması diyerek şuanki questionımızı aldık.
+	question.title = title; // güncellenmemiş sorumuzun title ını güncelledik
+	question.content = content; //güncellenmemiş sorumuzun contentini güncelledik.
+	this.question = await question.save(); //editlenmiş questionımız buraya gelecek ve save edilerek veri tabanına yazdık.ve bize güncellenmiş sorumuz geldi.
+	return res.status(200).json({
+		success: true,
+		data: question
+	});
+});
 
-module.exports = { getAllQuetions, askNewQuestion,getSingleQuestion };
+module.exports = { getAllQuetions, askNewQuestion, getSingleQuestion, editQuestion };
