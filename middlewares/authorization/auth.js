@@ -1,6 +1,7 @@
 const CustomError = require('../../helpers/error/CustomErrors');
 const asyncErrorWrapper = require('express-async-handler');
 const User = require('../../models/User');
+const Question = require('../../models/Question');
 const jwt = require('jsonwebtoken');
 const { isTokenIncluded, getAccessTokenFromHeader } = require('../../helpers/authorization/tokenHelpers');
 const getAccessToRoute = (req, res, next) => {
@@ -35,7 +36,20 @@ const getAdminAccess = asyncErrorWrapper(async (req, res, next) => {
 	}
 	next(); //eğer kullanıcı admin ise sonraki fonksiyona yönlendirilecek.
 });
+const getQuestionOwnerAccess = asyncErrorWrapper(async (req, res, next) => {
+	//ilk başta getAccessToRoute kullanılacak ordan geçerse  bu kullanılacak.Oyüzden kullanıcı giriş yapmış demektir.
+	const userId = req.user.id; //Giriş yapmışş kullanıcı idsi
+	const questionId = req.params.id;
+	//question collectionına sorgu atamam gerekiyor bu yüzden question modeli ni dahil etmem gerekecek.
+	const question = await Question.findById(questionId);
+	if (question.user != userId) {
+		//Question içinde ki user id ile req.user.id aynı değil ise hata yollamalıyız.
+		return next(new CustomError('Only owner can handle this operation.', 403));
+	}
+	next();
+});
 module.exports = {
 	getAccessToRoute, //bu middleware nerde kullanıcam routers/auth.js içinde kullanacağım başka yerlerde de kullanabilirim
-	getAdminAccess
+	getAdminAccess,
+	getQuestionOwnerAccess
 };
