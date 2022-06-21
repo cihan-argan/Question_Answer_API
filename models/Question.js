@@ -28,7 +28,14 @@ const QuestionSchema = new Schema({
 		required: true,
 		//User ve questions ilişkisini belirtmek için bizim bunu user modelimize bağlamamız gerekiyor.yani referansını vermemiz gerekiyor.
 		ref: 'User'
-	}
+	},
+	likes: [
+		//Bizim burda like işlemlerinı tutmak için yapımız olacak.Burda giriş yapmış kullanıcıların idsini tutmamız gerekecek ve bir soruya çok fazla like gelebileceği için bir çok id olacak demmektir.bizim burda bu idleri array olarak tutmamız gerekecek. Bu arrayin her bir  elemanı da object bir tane object id olacak.
+		{
+			type: mongoose.Schema.ObjectId, //Burda bir sürü objectId olacak ve User a referance edecek.
+			ref: 'User'
+		}
+	]
 });
 QuestionSchema.pre('save', function(next) {
 	//eğer title değişmiş ise

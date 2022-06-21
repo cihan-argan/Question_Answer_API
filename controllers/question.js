@@ -57,5 +57,24 @@ const deleteQuestion = asyncErrorWrapper(async (req, res, next) => {
 		message: 'Question delete operation successfull '
 	});
 });
+const likeQuestion = asyncErrorWrapper(async (req, res, next) => {
+	// ilk olarak questionımızı almamız gerekiyor.
+	const { id } = req.params;
+	const question = await Question.findById(id);
+	//Giriş yapmış kullanıcı bu soruya like etmişse
+	if (question.likes.includes(req.user.id)) {
+		return next(new CustomError('You already likes this question', 400));
+	}
+	//giriş yapılan kullanıcının id si bu sorudaki likes arrayinde mevcut değil ise arraye bu kullanıcıyı ekliyoruz.
+	question.likes.push(req.user.id);
+	//daha sonra güncellemiş bu soruyu veri tabanına yazmamız gerekiyor.
+	const likesLength = await question.likes.length;
+	await question.save();
+	return res.status(200).json({
+		success: true,
+		data: question,
+		numberOfLikes: likesLength
+	});
+});
 
-module.exports = { getAllQuetions, askNewQuestion, getSingleQuestion, editQuestion, deleteQuestion };
+module.exports = { getAllQuetions, askNewQuestion, getSingleQuestion, editQuestion, deleteQuestion, likeQuestion };
