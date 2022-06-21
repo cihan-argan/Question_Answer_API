@@ -1,4 +1,5 @@
 const User = require('../../models/User');
+const Question = require('../../models/Question');
 const CustomError = require('../../helpers/error/CustomErrors');
 const asyncErrorWrapper = require('express-async-handler');
 
@@ -12,7 +13,19 @@ const checkUserExist = asyncErrorWrapper(async (req, res, next) => {
 	}
 	next();
 });
+const checkQuestionExist = asyncErrorWrapper(async (req, res, next) => {
+	//Ben burda Questiona göre sorgulama yapacağım için Question dahil etmemiz gerekecek.
+	const { id } = req.params;
+	const question = await Question.findById(id); //Question ımız id ye göre bize döncek.
+	//id ye göre bu question yok ise
+	if (!question) {
+		return next(new CustomError('There is no such question with that id', 400));
+	}
+	//eğer question var ise devam edecekç
+	next();
+});
 module.exports = {
-	checkUserExist
-	//nerde kullanacağız routers içindeki user.js te controllerdan öncesine eklememiz gerekecek.
+	checkUserExist, ///nerde kullanacağız routers içindeki herhangi bir yerde User  var mı yok mu diye control ettireceğimiz zaman kullanabiliriz.
+
+	checkQuestionExist // nerde kullanacağız routers içindeki herhangi bir yerde question var mı yok mu diye control ettireceğimiz zaman kullanabiliriz.
 };
