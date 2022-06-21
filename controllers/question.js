@@ -49,5 +49,13 @@ const editQuestion = asyncErrorWrapper(async (req, res, next) => {
 		data: question
 	});
 });
+const deleteQuestion = asyncErrorWrapper(async (req, res, next) => {
+	const { id } = req.params;
+	await Question.findByIdAndDelete(id); //burda post hook işlemi olmayacak id ye göre bul ve sil demek yeterli
+	return res.status(200).json({
+		success: true,
+		message: 'Question delete operation successfull '
+	});
+});
 
-module.exports = { getAllQuetions, askNewQuestion, getSingleQuestion, editQuestion };
+module.exports = { getAllQuetions, askNewQuestion, getSingleQuestion, editQuestion, deleteQuestion };
