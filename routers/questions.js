@@ -8,7 +8,8 @@ const {
 	getSingleQuestion,
 	editQuestion,
 	deleteQuestion,
-	likeQuestion
+	likeQuestion,
+	undoLikeQuestion
 } = require('../controllers/question');
 const { getAccessToRoute, getQuestionOwnerAccess } = require('../middlewares/authorization/auth');
 
@@ -18,6 +19,7 @@ const { checkQuestionExist } = require('../middlewares/database/databaseErrorHan
 router.get('/', getAllQuetions); //Tüm soruları getir
 router.get('/:id', checkQuestionExist, getSingleQuestion); //tek bir soruyu getirmek için
 router.get('/:id/like', [ getAccessToRoute, checkQuestionExist ], likeQuestion);
+router.get('/:id/undo_like', [ getAccessToRoute, checkQuestionExist ], undoLikeQuestion);
 
 router.post('/ask', getAccessToRoute, askNewQuestion); //Soru ekleme
 router.put('/:id/edit', [ getAccessToRoute, checkQuestionExist, getQuestionOwnerAccess ], editQuestion);

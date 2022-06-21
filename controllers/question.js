@@ -76,5 +76,33 @@ const likeQuestion = asyncErrorWrapper(async (req, res, next) => {
 		numberOfLikes: likesLength
 	});
 });
+const undoLikeQuestion = asyncErrorWrapper(async (req, res, next) => {
+	const { id } = req.params;
+	const question = await Question.findById(id);
 
-module.exports = { getAllQuetions, askNewQuestion, getSingleQuestion, editQuestion, deleteQuestion, likeQuestion };
+	//Bu id li kullanıcı gerçekten sorumuzu like etmişmmi etmemiş mi bunu kontrol edicez.etmemişse burda hata vermemiz gerekecek.
+	if (!question.likes.includes(req.user.id)) {
+		//Burda zaten kullanıcımız like etmemiş demektir. hata fırlatacağız.
+		return next(new CustomError('You can not undo like opreation for this question ', 400));
+	}
+	//Kontrolü geçmişse kullanıcı like etmiş demektir.Kullanıcının idsininin indexini  likes array içinde bulmamız gerekecek
+	const index = question.likes.indexOf(req.user.id);
+	question.likes.splice(index, 1);
+	const likesLength = await question.likes.length;
+	await question.save();
+	return res.status(200).json({
+		success: true,
+		data: question,
+		numberOfLikes: likesLength
+	});
+});
+
+module.exports = {
+	getAllQuetions,
+	askNewQuestion,
+	getSingleQuestion,
+	editQuestion,
+	deleteQuestion,
+	likeQuestion,
+	undoLikeQuestion
+};
