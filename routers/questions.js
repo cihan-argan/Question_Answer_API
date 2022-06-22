@@ -1,6 +1,9 @@
 //Routers>Question.js
 // /api/questions/
 const express = require('express');
+//Answer Route Burda alıyoruz çünkü Question ile çok sıkı ilişkide olan bir yapı olduğu için
+const answer = require('./answer');
+
 const router = express.Router();
 const {
 	getAllQuetions,
@@ -12,7 +15,6 @@ const {
 	undoLikeQuestion
 } = require('../controllers/question');
 const { getAccessToRoute, getQuestionOwnerAccess } = require('../middlewares/authorization/auth');
-
 const { checkQuestionExist } = require('../middlewares/database/databaseErrorHandler');
 
 // /api/questions a gittiğimizde bu public bir işlem olacağı için getAccessToRoute olmayacak
@@ -30,5 +32,8 @@ router.put('/:id/edit', [ getAccessToRoute, checkQuestionExist, getQuestionOwner
 4-controller/question.js içinde çalıaşacak editQuestion fonksiyonunu yazıcaz. */
 router.delete('/:id/delete', [ getAccessToRoute, checkQuestionExist, getQuestionOwnerAccess ], deleteQuestion);
 
+//Answer Route
+router.use('/:id/answers', checkQuestionExist, answer);
+// api/12354(quesiton_id) / answers gelirse bizim routers/answer.js içindeki yazdığımız get post requestler çalışabilecek.
 //kullanabilmek için
 module.exports = router;

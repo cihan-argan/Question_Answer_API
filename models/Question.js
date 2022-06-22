@@ -39,7 +39,7 @@ const QuestionSchema = new Schema({
 	answer: [
 		//Like daki gibi her bir soruya binlerce cevap gelebilir bunun için array içinde tutucaz.yine object id tutucak fakat referansımız ise bu sefer Answer olacak
 		{
-			tyype: mongoose.Schema.ObjectId,
+			type: mongoose.Schema.ObjectId,
 			ref: 'Answer'
 		}
 	]

@@ -12,5 +12,5 @@ router.use('/questions', question);
 router.use('/auth', auth);
 router.use('/users', user);
 router.use('/admin', admin); //admini kullandık
-
+/* Not ****: Answer route buraya yazmıyoruz sebep olarak Answer Question ile çok sıkı ilişki içinde olduğu için onu buraya eklemiyoruz routers/quesiton.js içinde alacağız.*/
 module.exports = router;
