@@ -35,6 +35,13 @@ const QuestionSchema = new Schema({
 			type: mongoose.Schema.ObjectId, //Burda bir sürü objectId olacak ve User a referance edecek.
 			ref: 'User'
 		}
+	],
+	answer: [
+		//Like daki gibi her bir soruya binlerce cevap gelebilir bunun için array içinde tutucaz.yine object id tutucak fakat referansımız ise bu sefer Answer olacak
+		{
+			tyype: mongoose.Schema.ObjectId,
+			ref: 'Answer'
+		}
 	]
 });
 QuestionSchema.pre('save', function(next) {
