@@ -15,9 +15,11 @@ const checkUserExist = asyncErrorWrapper(async (req, res, next) => {
 });
 const checkQuestionExist = asyncErrorWrapper(async (req, res, next) => {
 	//Ben burda Questiona göre sorgulama yapacağım için Question dahil etmemiz gerekecek.
-	const { id } = req.params;
-	const question = await Question.findById(id); //Question ımız id ye göre bize döncek.
+	const question_id =	 req.params.id || req.params.question_id; //Hem id yi hemde question_id yi göderilirse alacak.
+	/*Sana id gönderilmişse bu id miz gönderilmiş id olacak ancak id değilde question_id şeklinde  gönderilmişsede onu al dicem. */
+	const question = await Question.findById(question_id); //Question ımız id ye göre bize döncek.
 	//id ye göre bu question yok ise
+	
 	if (!question) {
 		return next(new CustomError('There is no such question with that id', 400));
 	}

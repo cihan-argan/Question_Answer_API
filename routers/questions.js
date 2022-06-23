@@ -33,7 +33,7 @@ router.put('/:id/edit', [ getAccessToRoute, checkQuestionExist, getQuestionOwner
 router.delete('/:id/delete', [ getAccessToRoute, checkQuestionExist, getQuestionOwnerAccess ], deleteQuestion);
 
 //Answer Route
-router.use('/:id/answers', checkQuestionExist, answer);
+router.use('/:question_id/answers', checkQuestionExist, answer);
 // api/12354(quesiton_id) / answers gelirse bizim routers/answer.js içindeki yazdığımız get post requestler çalışabilecek.
 //kullanabilmek için
 module.exports = router;
