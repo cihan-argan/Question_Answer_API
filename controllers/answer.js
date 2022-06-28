@@ -72,10 +72,24 @@ const editAnswer = asyncErrorWrapper(async (req, res, next) => {
 		data: answer
 	});
 });
-
+const deleteAnswer = asyncErrorWrapper(async (req, res, next) => {
+	//delete işlemi gerçekleştiren fonksiyon.Biz questionlarda hem diziden hemde collectiondan kaldırma işlemini post hooks ile yapmıştık Bknz:models/user.js  burda soruları user model içindeki question arrayinden kaldırmıştık farklı bir yöntem öğreneceğiz.Tüm işlemlerimiz burda gerçekleştireceğiz.
+	//ilk olarak answer_id yi aldık bize birde question id gelecek onuda alıyoruz.
+	const { answer_id } = req.params;
+	const { question_id } = req.params;
+	await Answer.findByIdAndRemove(answer_id); //Bunu kaldırdık
+	const question = await Question.findById(question_id); //sorumuzu idye göre bulduk
+	question.answers.splice(question.answers.indexOf(answer_id), 1);
+	await question.save();
+	return res.status(200).json({
+		success: true,
+		message: 'Answer deleted successfully..'
+	});
+});
 module.exports = {
 	addNewAnswerToQuestion,
 	getAllAnswersByQuestion,
 	getSingleAnswer,
-	editAnswer
+	editAnswer,
+	deleteAnswer
 };
