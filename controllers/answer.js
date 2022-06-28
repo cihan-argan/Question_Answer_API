@@ -86,10 +86,48 @@ const deleteAnswer = asyncErrorWrapper(async (req, res, next) => {
 		message: 'Answer deleted successfully..'
 	});
 });
+const likeAnswer = asyncErrorWrapper(async (req, res, next) => {
+	//Like Answer da ilk başta answer_id mizi alacağız.
+	const { answer_id } = req.params;
+	//Daha sonra bu id ile answerımızı bulucaz
+	const answer = await Answer.findById(answer_id);
+	//daha sonra answerın likes ının içinde eğer zaten like atmaya çalışan userın idsi varsa hata yollicaz bunu includes ile kontrol edicez
+	if (answer.likes.includes(req.user.id)) {
+		return next(new CustomError('You already liked this answer ', 400));
+	}
+	//Eğer o like atmaya çalışan kullanıcı daha önce like atmamış ise o kullanıcıyı answer modelinin likes arrayine ekleyeceğiz.
+	answer.likes.push(req.user.id);
+	//tekrardan answerımızı kayıt edicez.
+	await answer.save();
+	return res.status(200).json({
+		success: true,
+		data: answer
+	});
+});
+const undoLikeAnswer = asyncErrorWrapper(async (req, res, next) => {
+	//undolike Answer içinde aynı şekilde answer idmizi alıcaz.
+	const { answer_id } = req.params;
+	const answer = await Answer.findById(answer_id);
+	//Like ını kaldırmaya çalışan kullanıcı ilgili cevapta like ı yoksa likeını kaldıramayacak bunun için kontrolümüzü yapıyoruz içermiyorsa  dislike atamazsın hatası vereceğiz.
+	if (!answer.likes.includes(req.user.id)) {
+		return next(new CustomError('You can not undo like operation for this answer', 400));
+	}
+	//eğer bu adım bu soruda bir likeı varsa bu ife girmeyecek ve bizim bu adamın likes dizisindeki idsinin bulunduğu indexi bulmamız gerekecek.
+	const index = await answer.likes.indexOf(req.params.answer_id);
+	answer.likes.splice(index, 1);
+
+	await answer.save();
+	return res.status(200).json({
+		success: true,
+		data: answer
+	});
+});
 module.exports = {
 	addNewAnswerToQuestion,
 	getAllAnswersByQuestion,
 	getSingleAnswer,
 	editAnswer,
-	deleteAnswer
+	deleteAnswer,
+	likeAnswer,
+	undoLikeAnswer
 };
