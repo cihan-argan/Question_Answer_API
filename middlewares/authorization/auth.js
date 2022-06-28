@@ -2,6 +2,7 @@ const CustomError = require('../../helpers/error/CustomErrors');
 const asyncErrorWrapper = require('express-async-handler');
 const User = require('../../models/User');
 const Question = require('../../models/Question');
+const Answer = require('../../models/Answer');
 const jwt = require('jsonwebtoken');
 const { isTokenIncluded, getAccessTokenFromHeader } = require('../../helpers/authorization/tokenHelpers');
 const getAccessToRoute = (req, res, next) => {
@@ -48,8 +49,22 @@ const getQuestionOwnerAccess = asyncErrorWrapper(async (req, res, next) => {
 	}
 	next();
 });
+
+const getAnswerOwnerAccess = asyncErrorWrapper(async (req, res, next) => {
+	//Burda yine userid ve answer id alacağız
+	const userId = req.user.id;
+	const answerId = req.params.answer_id;
+	//daha sonra biz answerımızı çekmeye çalışacağız Bunun için ilk başta Answer modelini require etmemiz gerekiyor
+	const answer = await Answer.findById(answerId);
+	if (answer.user != userId) {
+		//answer içindeki user id girilmeye çalışan userın id ile aynı değilse hata fırlatıyoruz.
+		return next(new CustomError('Only owner can handle this operation', 403));
+	}
+	next();
+});
 module.exports = {
 	getAccessToRoute, //bu middleware nerde kullanıcam routers/auth.js içinde kullanacağım başka yerlerde de kullanabilirim
 	getAdminAccess,
-	getQuestionOwnerAccess
+	getQuestionOwnerAccess,
+	getAnswerOwnerAccess
 };

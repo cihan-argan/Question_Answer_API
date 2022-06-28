@@ -55,8 +55,27 @@ const getSingleAnswer = asyncErrorWrapper(async (req, res, next) => {
 		data: answer
 	});
 });
+const editAnswer = asyncErrorWrapper(async (req, res, next) => {
+	//ilk başta answer id yi alıp answerımızı getirmemiz gerekecek
+	const { answer_id } = req.params;
+	//daha sonra yeni gelen contentimizide req.bodyden almamız gerekcek
+	const { content } = req.body;
+
+	//şimdi answerı alacağız güncelleme olacağı için let ile almam gerekekcek
+	let answer = await Answer.findById(answer_id);
+	answer.content = content;
+
+	await answer.save();
+
+	return res.status(200).json({
+		success: true,
+		data: answer
+	});
+});
+
 module.exports = {
 	addNewAnswerToQuestion,
 	getAllAnswersByQuestion,
-	getSingleAnswer
+	getSingleAnswer,
+	editAnswer
 };

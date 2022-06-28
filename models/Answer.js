@@ -45,6 +45,7 @@ AnswerSchema.pre('save', async function(next) {
 		await question.save();
 		next();
 	} catch (err) {
+		console.log(err);
 		return next(err);
 	}
 });
