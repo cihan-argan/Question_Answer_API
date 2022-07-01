@@ -4,7 +4,21 @@ const CustomError = require('../helpers/error/CustomErrors'); //CıstomError al�
 const asyncErrorWrapper = require('express-async-handler'); //asyncErrorWrapper alınacak
 
 const getAllQuetions = asyncErrorWrapper(async (req, res, next) => {
-	const questions = await Question.find(); //Tüm Questionları çekmeye çalışıyorum
+	let query = Question.find(); //default querymiz
+	//req.query.search gelmişmi kontrolü yapılıyor.
+	if (req.query.search) {
+		// title ve request.query.search içinde searchValue ya göre  object oluşturucaz
+		const searchObject = {};
+		//ilk önce bir tane regex oluşturucaz
+		const regex = new RegExp(req.query.search, 'i'); //RegExp(mongodB,"i") burda search keyi içine gelen değeri alıyoruz i ile büyük küçük harf farkını kaldırıyoruz.
+		//Şimdi searchObjectimizi oluşturalım.
+		searchObject['title'] = regex; //Title göre regex ile alınan değeri arayacak
+		//Son olarak yukarda oluşturduğumuz başlangıç querysini güncellemem gerekecek.
+		//mongoDb DEKİ where kullanabiliriz
+		query = query.where(searchObject);
+		//Question.find().where({title : regex}); yeni querimiz oldu
+	}
+	const questions = await query;
 	return res.status(200).json({
 		success: true,
 		data: questions
