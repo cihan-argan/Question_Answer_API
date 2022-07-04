@@ -3,6 +3,7 @@
 const express = require('express');
 //Answer Route Burda alıyoruz çünkü Question ile çok sıkı ilişkide olan bir yapı olduğu için
 const answer = require('./answer');
+const Question = require('../models/Question');
 
 const router = express.Router();
 const {
@@ -14,11 +15,22 @@ const {
 	likeQuestion,
 	undoLikeQuestion
 } = require('../controllers/question');
+
+const questionQueryMiddleware = require('../middlewares/query/questionQueryMiddleware');
 const { getAccessToRoute, getQuestionOwnerAccess } = require('../middlewares/authorization/auth');
 const { checkQuestionExist } = require('../middlewares/database/databaseErrorHandler');
 
 // /api/questions a gittiğimizde bu public bir işlem olacağı için getAccessToRoute olmayacak
-router.get('/', getAllQuetions); //Tüm soruları getir
+router.get(
+	'/',
+	questionQueryMiddleware(Question, {
+		population: {
+			path: 'user',
+			select: 'name profile_image'
+		}
+	}),
+	getAllQuetions
+); //Tüm soruları getir
 router.get('/:id', checkQuestionExist, getSingleQuestion); //tek bir soruyu getirmek için
 router.get('/:id/like', [ getAccessToRoute, checkQuestionExist ], likeQuestion);
 router.get('/:id/undo_like', [ getAccessToRoute, checkQuestionExist ], undoLikeQuestion);
