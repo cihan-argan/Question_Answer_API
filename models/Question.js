@@ -29,6 +29,10 @@ const QuestionSchema = new Schema({
 		//User ve questions ilişkisini belirtmek için bizim bunu user modelimize bağlamamız gerekiyor.yani referansını vermemiz gerekiyor.
 		ref: 'User'
 	},
+	likeCount: {
+		type: Number,
+		default: 0
+	},
 	likes: [
 		//Bizim burda like işlemlerinı tutmak için yapımız olacak.Burda giriş yapmış kullanıcıların idsini tutmamız gerekecek ve bir soruya çok fazla like gelebileceği için bir çok id olacak demmektir.bizim burda bu idleri array olarak tutmamız gerekecek. Bu arrayin her bir  elemanı da object bir tane object id olacak.
 		{
@@ -36,6 +40,10 @@ const QuestionSchema = new Schema({
 			ref: 'User'
 		}
 	],
+	answerCount: {
+		type: Number,
+		default: 0
+	},
 	answers: [
 		//Like daki gibi her bir soruya binlerce cevap gelebilir bunun için array içinde tutucaz.yine object id tutucak fakat referansımız ise bu sefer Answer olacak
 		{

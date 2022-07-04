@@ -12,6 +12,10 @@ const AnswerSchema = new Schema({
 		type: Date,
 		default: Date.now
 	},
+	likeCount: {
+		type: Number,
+		default: 0
+	},
 	likes: [
 		{
 			type: mongoose.Schema.ObjectId,
@@ -42,6 +46,7 @@ AnswerSchema.pre('save', async function(next) {
 		//questionu aldık zaten answer idsi _id olarak elimizde
 		question.answers.push(this._id);
 		// Answer modelde  olduğumuz  için  answer idsi şuanki elimizdeki id olduğu için this. _id ile ilgili questionın  question modelide bulunan  answers arrayi  içine ekliyoruz. ekledikten sonrada questionı alıp tekrardan veritabanına yazmamız gerekiyor sonucta güncelleme yapıldı.
+		question.answerCount = question.answers.length;//Cevap sayısını question.answers.length uzunluğuna atadık.(aynısnı answerın silindiği yerdede yapmamız gerekekcek)
 		await question.save();
 		next();
 	} catch (err) {

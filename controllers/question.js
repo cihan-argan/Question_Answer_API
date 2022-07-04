@@ -114,14 +114,13 @@ const likeQuestion = asyncErrorWrapper(async (req, res, next) => {
 		return next(new CustomError('You already likes this question', 400));
 	}
 	//giriş yapılan kullanıcının id si bu sorudaki likes arrayinde mevcut değil ise arraye bu kullanıcıyı ekliyoruz.
-	question.likes.push(req.user.id);
+		question.likes.push(req.user.id);
+		question.likeCount = question.likes.length;
 	//daha sonra güncellemiş bu soruyu veri tabanına yazmamız gerekiyor.
-	const likesLength = await question.likes.length;
 	await question.save();
 	return res.status(200).json({
 		success: true,
-		data: question,
-		numberOfLikes: likesLength
+		data: question
 	});
 });
 const undoLikeQuestion = asyncErrorWrapper(async (req, res, next) => {
@@ -136,12 +135,11 @@ const undoLikeQuestion = asyncErrorWrapper(async (req, res, next) => {
 	//Kontrolü geçmişse kullanıcı like etmiş demektir.Kullanıcının idsininin indexini  likes array içinde bulmamız gerekecek
 	const index = question.likes.indexOf(req.user.id);
 	question.likes.splice(index, 1);
-	const likesLength = await question.likes.length;
+	question.likeCount = question.likes.length;
 	await question.save();
 	return res.status(200).json({
 		success: true,
-		data: question,
-		numberOfLikes: likesLength
+		data: question
 	});
 });
 

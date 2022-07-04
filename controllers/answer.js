@@ -80,6 +80,7 @@ const deleteAnswer = asyncErrorWrapper(async (req, res, next) => {
 	await Answer.findByIdAndRemove(answer_id); //Bunu kaldırdık
 	const question = await Question.findById(question_id); //sorumuzu idye göre bulduk
 	question.answers.splice(question.answers.indexOf(answer_id), 1);
+	question.answerCount = question.answers.length;
 	await question.save();
 	return res.status(200).json({
 		success: true,
@@ -97,6 +98,7 @@ const likeAnswer = asyncErrorWrapper(async (req, res, next) => {
 	}
 	//Eğer o like atmaya çalışan kullanıcı daha önce like atmamış ise o kullanıcıyı answer modelinin likes arrayine ekleyeceğiz.
 	answer.likes.push(req.user.id);
+	answer.likeCount = answer.likes.length;
 	//tekrardan answerımızı kayıt edicez.
 	await answer.save();
 	return res.status(200).json({
@@ -115,6 +117,7 @@ const undoLikeAnswer = asyncErrorWrapper(async (req, res, next) => {
 	//eğer bu adım bu soruda bir likeı varsa bu ife girmeyecek ve bizim bu adamın likes dizisindeki idsinin bulunduğu indexi bulmamız gerekecek.
 	const index = await answer.likes.indexOf(req.params.answer_id);
 	answer.likes.splice(index, 1);
+	answer.likeCount = answer.likes.length;
 
 	await answer.save();
 	return res.status(200).json({
