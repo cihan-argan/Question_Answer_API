@@ -52,18 +52,17 @@ const getAllQuetions = asyncErrorWrapper(async (req, res, next) => {
 	query = query.skip(startIndex).limit(limit); // skip(atlayacağı index sayısı ).limit(kaç tane kayıt getirecek)
 
 	//Sort = req.query.sortBy most-answered / most-liked
-	const sortKey = req.query.sortBy; 
+	const sortKey = req.query.sortBy;
 
-	if(sortKey === 'most-answered'){
+	if (sortKey === 'most-answered') {
 		//query = query.sort("answerCount") dersek küçükten büyüğe doğru yani answer ı az olandan çok olana doğru sıralar
-		query = query.sort("-answerCount"); // Büyükten küçüğe doğru 
+		query = query.sort('-answerCount -createdAt'); // Büyükten küçüğe doğru
 	}
-	if(sortKey === 'most-liked'){
-		//query = query.sort("likeCount") dersek küçükten büyüğe doğru sıralar. like ı az olandan çok olana doğru 
-		query = query.sort("-likeCount"); // Büyükten küçüğe doğru 
-	}
-	else{
-		query = query.sort("-createdAt"); //Bişey verilmezse en güncel sorudan en az güncel olana doğru sıraladık.
+	if (sortKey === 'most-liked') {
+		//query = query.sort("likeCount") dersek küçükten büyüğe doğru sıralar. like ı az olandan çok olana doğru
+		query = query.sort('-likeCount -createdAt'); // Büyükten küçüğe doğru
+	} else {
+		query = query.sort('-createdAt'); //Bişey verilmezse en güncel sorudan en az güncel olana doğru sıraladık.
 	}
 
 	const questions = await query;
@@ -130,8 +129,8 @@ const likeQuestion = asyncErrorWrapper(async (req, res, next) => {
 		return next(new CustomError('You already likes this question', 400));
 	}
 	//giriş yapılan kullanıcının id si bu sorudaki likes arrayinde mevcut değil ise arraye bu kullanıcıyı ekliyoruz.
-		question.likes.push(req.user.id);
-		question.likeCount = question.likes.length;
+	question.likes.push(req.user.id);
+	question.likeCount = question.likes.length;
 	//daha sonra güncellemiş bu soruyu veri tabanına yazmamız gerekiyor.
 	await question.save();
 	return res.status(200).json({
