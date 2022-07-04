@@ -1,5 +1,6 @@
 const asyncErrorWrapper = require('express-async-handler');
 const { searchHelper, populateHelper, questionSortHelper, paginationHelper } = require('./queryMiddlewareHelpers');
+
 const questionQueryMiddleware = function(model, options) {
 	//Bu function bir tane middlewareFunctionı return edecek Bu middleware funtion ise zaten bizim normal middleware function olacak.
 	/*Yani birtane normal function oluşturuyoruz bu bir tanne middleware dönecek.argüman gönderildiği için. */

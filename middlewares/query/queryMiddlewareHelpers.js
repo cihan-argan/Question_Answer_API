@@ -4,7 +4,7 @@ const searchHelper = (searchKey, query, req) => {
 	if (req.query.search) {
 		const searchObject = {};
 		const regex = new RegExp(req.query.search, 'i');
-		searchObject['title'] = regex;
+		searchObject[searchKey] = regex;
 		return query.where(searchObject);
 		//Question.find().where({title : regex}); yeni querimiz oldu
 	}
@@ -69,5 +69,5 @@ module.exports = {
 	searchHelper,
 	populateHelper,
 	questionSortHelper,
-    paginationHelper
+	paginationHelper
 };
