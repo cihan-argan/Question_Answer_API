@@ -50,6 +50,22 @@ const getAllQuetions = asyncErrorWrapper(async (req, res, next) => {
 		};
 	}
 	query = query.skip(startIndex).limit(limit); // skip(atlayacağı index sayısı ).limit(kaç tane kayıt getirecek)
+
+	//Sort = req.query.sortBy most-answered / most-liked
+	const sortKey = req.query.sortBy; 
+
+	if(sortKey === 'most-answered'){
+		//query = query.sort("answerCount") dersek küçükten büyüğe doğru yani answer ı az olandan çok olana doğru sıralar
+		query = query.sort("-answerCount"); // Büyükten küçüğe doğru 
+	}
+	if(sortKey === 'most-liked'){
+		//query = query.sort("likeCount") dersek küçükten büyüğe doğru sıralar. like ı az olandan çok olana doğru 
+		query = query.sort("-likeCount"); // Büyükten küçüğe doğru 
+	}
+	else{
+		query = query.sort("-createdAt"); //Bişey verilmezse en güncel sorudan en az güncel olana doğru sıraladık.
+	}
+
 	const questions = await query;
 	return res.status(200).json({
 		success: true,
