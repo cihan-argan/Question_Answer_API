@@ -17,11 +17,13 @@ const questionQueryMiddleware = function(model, options) {
 		}
 		//4.işlem sort işlemi burdada bir  queryMiddlewareHelpers.js questionSortHelper fonksiyonu oluşturucağız
 		query = questionSortHelper(query, req);
-		//5.işlem Pagination işlemi  burdada bir  queryMiddlewareHelpers.js paginationHelper fonksiyonu oluşturucağız
-		const paginationResult = await paginationHelper(model, query, req); //Burda bize obje dönüyor bu şekilde almamız gerekiyor
+		//5.işlem Pagination işlemi
+		// burdada bir  queryMiddlewareHelpers.js paginationHelper fonksiyonu oluşturucağız ama öncesinde total oluşturmamız gerekecek
+		const total = await model.countDocuments();
+		const paginationResult = await paginationHelper(total, query, req); //Burda bize obje dönüyor bu şekilde almamız gerekiyor
 		query = paginationResult.query;
 		const pagination = paginationResult.pagination;
-//Burdan sonra artık querymizin responsunu yollamaya çalışacağız.
+		//Burdan sonra artık querymizin responsunu yollamaya çalışacağız.
 		const queryResults = await query;
 		res.queryResults = {
 			//Bunu yapmamızdaki sebep bunun GetAllQuestionda kullanilabilmesi için

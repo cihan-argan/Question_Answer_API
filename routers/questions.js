@@ -17,6 +17,8 @@ const {
 } = require('../controllers/question');
 
 const questionQueryMiddleware = require('../middlewares/query/questionQueryMiddleware');
+const answerQueryMiddleware = require('../middlewares/query/answerQueryMiddleware');
+
 const { getAccessToRoute, getQuestionOwnerAccess } = require('../middlewares/authorization/auth');
 const { checkQuestionExist } = require('../middlewares/database/databaseErrorHandler');
 
@@ -31,7 +33,26 @@ router.get(
 	}),
 	getAllQuetions
 ); //Tüm soruları getir
-router.get('/:id', checkQuestionExist, getSingleQuestion); //tek bir soruyu getirmek için
+router.get(
+	'/:id',
+	checkQuestionExist,
+	answerQueryMiddleware(Question, {
+		//Eğer biz bir kactane alanı populate edeceksek array şeklinde kullanmalıyız.
+		population: [
+			{
+				//1.populate alanı = questionın userını populate edeceğiz.
+				path: 'user',
+				select: 'name profile_image'
+			},
+			{
+				//2.populate alanı : answers larıda populate edicez
+				path: 'answers',
+				select: 'content'
+			}
+		]
+	}),
+	getSingleQuestion
+); //tek bir soruyu getirmek için
 router.get('/:id/like', [ getAccessToRoute, checkQuestionExist ], likeQuestion);
 router.get('/:id/undo_like', [ getAccessToRoute, checkQuestionExist ], undoLikeQuestion);
 

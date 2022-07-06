@@ -7,7 +7,9 @@ const userQueryMiddleware = function(model, options) {
 		//2.adım biz userları search ederken name a göre search yaptırıcaz bize hem querymiz gerekecek mantıken user.find() burda search ile name göre istek atıcaz hangi name olduğu ise requestin içinde gelecek. search by name kısmı
 		query = searchHelper('name', query, req);
 		//3.adım pagination
-		const paginationResult = await paginationHelper(model, query, req);
+		//İlk önce total oluşturucaz 
+		const total = await model.countDocuments();
+		const paginationResult = await paginationHelper(total, query, req);
 		query = paginationResult.query;
 		pagination = paginationResult.pagination;
 
